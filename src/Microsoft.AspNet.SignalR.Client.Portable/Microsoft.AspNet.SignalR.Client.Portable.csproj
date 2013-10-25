@@ -220,6 +220,9 @@
     <Compile Include="..\Microsoft.AspNet.SignalR.Core\Infrastructure\ExceptionsExtensions.cs">
       <Link>Infrastructure\ExceptionsExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Microsoft.AspNet.SignalR.Core\Infrastructure\TaskQueue.cs">
+      <Link>Infrastructure\TaskQueue.cs</Link>
+    </Compile>
     <Compile Include="..\Microsoft.AspNet.SignalR.Core\Owin\Infrastructure\ByteBuffer.cs">
       <Link>Infrastructure\ByteBuffer.cs</Link>
     </Compile>
