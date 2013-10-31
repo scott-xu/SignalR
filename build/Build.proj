@@ -7,6 +7,7 @@
     <Nightly Condition="$(Nightly) == ''">true</Nightly>
     <ProjectRoot>$(MSBuildProjectDirectory)\..</ProjectRoot>
     <ArtifactsDir>$(ProjectRoot)\artifacts\$(Configuration)</ArtifactsDir>
+    <XamarinDir>$(ProjectRoot)\xamarin</XamarinDir>
     <ProjectArtifactsDir>$(ArtifactsDir)\projects</ProjectArtifactsDir>
     <JSTestsPath>$(ProjectArtifactsDir)\JsTestHarness</JSTestsPath>
     <PackageSrcDir>$(ArtifactsDir)\package-src</PackageSrcDir>
@@ -325,8 +326,8 @@
              Condition="%(Build) And '$(OS)' == 'Windows_NT'"/>
 
     <MSBuild Projects="$(ProjectRoot)\Microsoft.AspNet.SignalR.Mono.sln"
-             Properties="Configuration=$(Configuration);ArtifactsDir=$(ProjectArtifactsDir);$(ExtraProperties)"
-             Condition=" '$(OS)' != 'Windows_NT'" />
+            Properties="Configuration=$(Configuration);ArtifactsDir=$(ProjectArtifactsDir);$(ExtraProperties)"
+            Condition=" '$(OS)' != 'Windows_NT'" />
   </Target>
 
   <Target Name="CopyArtifacts" DependsOnTargets="Build">
@@ -448,5 +449,23 @@
     <RegexTransform Items="@(NuspecTransform)" />
     <Exec Command="&quot;$(NuGetExePath)&quot; pack &quot;%(Nuspecs.Identity)&quot; -o &quot;$(PackagesDestinationDir)&quot; -basePath &quot;$(PackageSrcDir)&quot;"
             LogStandardErrorAsError="true" />
+  </Target>
+
+  <Target Name="BuildXamarinComponent">
+    <MSBuild Projects="$(ProjectRoot)\src\Microsoft.AspNet.SignalR.Client.Portable\Microsoft.AspNet.SignalR.Client.Portable.csproj"
+          Properties="Configuration=$(Configuration);ArtifactsDir=$(ArtifactsDir);$(ExtraProperties)"
+          Condition="!Exists('$(ArtifactsDir)\Microsoft.AspNet.SignalR.Client.Portable\Microsoft.AspNet.SignalR.Client.dll')"/>
+
+    <ItemGroup>
+      <XamarinArtifacts Include="$(ArtifactsDir)\Microsoft.AspNet.SignalR.Client.Portable\Microsoft.AspNet.SignalR.Client.dll;
+                          $(ArtifactsDir)\Microsoft.AspNet.SignalR.Client.Portable\Microsoft.AspNet.SignalR.Client.xml;
+                          $(ArtifactsDir)\Microsoft.AspNet.SignalR.Client.Portable\System.Net.Http.Extensions.dll;
+                          $(ArtifactsDir)\Microsoft.AspNet.SignalR.Client.Portable\Newtonsoft.Json.dll">
+      </XamarinArtifacts>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(XamarinArtifacts)" DestinationFolder="$(XamarinDir)\SignalRPackage\component\lib\mobile"/>
+
+    <Exec Command='$(XamarinDir)\xamarin-component\xamarin-component.exe package "$(ProjectArtifactsDir)"' ContinueOnError="true" />
   </Target>
 </Project>
